@@ -1,7 +1,14 @@
 package com.javasampleapproach.webflux.model;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document
+
 public class Customer {
-	private long custId;
+
+	@Id
+private long custId;
 	private String firstname;
 	private String lastname;
 	private int age;
