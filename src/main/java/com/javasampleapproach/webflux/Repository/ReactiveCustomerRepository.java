@@ -7,7 +7,7 @@ import reactor.core.publisher.Flux;
 
 // репозиторий будет работать с базой данніх
 @Repository
-public interface ReactiveCustomerRepository extends ReactiveCrudRepository<Customer, Long> {
+public interface ReactiveCustomerRepository extends ReactiveCrudRepository<Customer, String> {
 
-    Flux<Customer> findByName(String name);
+   // Flux<Customer> findByName(String name);
 }

@@ -49,39 +49,34 @@ public class RestControllerAPIs {
     }
     
 	@GetMapping("/{id}")
-    public Mono<Customer> getCustomer(@PathVariable Long id) {
-		return Mono.justOrEmpty(custStores.get(id));
+    public Mono<Customer> getCustomer(@PathVariable String id) {
+		return reactiveCustomerRepository.findById(id);
     }
 	
 	
 	@PostMapping("/post")
-    public Mono<ResponseEntity<String>> postCustomer(@RequestBody Customer customer){
+    public Mono<Customer> postCustomer(@RequestBody Customer customer){
 		// do post
-		custStores.put(customer.getCustId(), customer);
+	return reactiveCustomerRepository.save(customer);
 		
-		// log on console
-		System.out.println("########### POST:" + customer);
-				
-		return Mono.just(new ResponseEntity<>("Post Successfully!", HttpStatus.CREATED));
 	}
 	
 	@PutMapping("/put/{id}")
-	public Mono<ResponseEntity<Customer>> putCustomer(@PathVariable Long id, @RequestBody Customer customer){
+	public Mono<Customer> putCustomer(@PathVariable String id, @RequestBody Customer customer){
 		// reset customer.Id
-		customer.setCustId(id);
-		
-		custStores.put(id, customer);
-		
-		// log on console
-		System.out.println("########### PUT:" + customer);
-		
-		return Mono.just(new ResponseEntity<>(customer, HttpStatus.CREATED));
-	}
+		return reactiveCustomerRepository.findById(id)
+				.flatMap(oldcustomer -> {
+					oldcustomer.setFirstname(customer.getFirstname());
+					oldcustomer.setLastname(customer.getLastname());
+					oldcustomer.setAge(customer.getAge());
+					return reactiveCustomerRepository.save(oldcustomer);
+		});
+    }
 	
 	@DeleteMapping("/delete/{id}")
-    public Mono<ResponseEntity<String>> deleteMethod(@PathVariable Long id) {
+    public Mono<ResponseEntity<String>> deleteMethod(@PathVariable String id) {
 		// delete processing
-    	custStores.remove(id);
+    	reactiveCustomerRepository.deleteById(id);
     	return Mono.just(new ResponseEntity<>("Delete Succesfully!", HttpStatus.ACCEPTED));
     }
 }
