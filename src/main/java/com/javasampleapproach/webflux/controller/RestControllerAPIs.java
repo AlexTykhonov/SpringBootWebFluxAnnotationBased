@@ -4,13 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.annotation.PostConstruct;
 
 import com.javasampleapproach.webflux.Repository.ReactiveCustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 
 import com.javasampleapproach.webflux.model.Customer;
@@ -74,11 +70,10 @@ public class RestControllerAPIs {
     }
 	
 	@DeleteMapping("/delete/{id}")
-    public Mono<ResponseEntity<String>> deleteMethod(@PathVariable String id) {
+    public Mono<Boolean> deleteMethod(@PathVariable String id) {
 		// delete processing
-    	reactiveCustomerRepository.deleteById(id);
-    	return Mono.just(new ResponseEntity<>("Delete Succesfully!", HttpStatus.ACCEPTED));
+    	Mono<Boolean> mono = reactiveCustomerRepository.deleteCustomerByCustId(id);
+    	return mono;
     }
 }
 
-//заменить хешмеп на репозиторий
