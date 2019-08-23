@@ -1,28 +1,32 @@
 package com.javasampleapproach.webflux.controller;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-
+import com.javasampleapproach.webflux.Repository.MongoQuery;
 import com.javasampleapproach.webflux.Repository.ReactiveCustomerRepository;
+import com.javasampleapproach.webflux.Repository.RepositoryCustomer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
-
 import com.javasampleapproach.webflux.model.Customer;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 @CrossOrigin
 @RestController
 @RequestMapping(value="/api/customer")
 public class RestControllerAPIs {
 	// это коллекшия которая хранит данные в формате ключ-значение
-	Map<Long, Customer> custStores = new HashMap<Long, Customer>();
+//	Map<Long, Customer> custStores = new HashMap<Long, Customer>();
+
+	@Autowired
+	RepositoryCustomer repositoryCustomer;
 
 	@Autowired
 	ReactiveCustomerRepository reactiveCustomerRepository;
+
+	@Autowired
+	MongoQuery mongoQuery;
 
 //    @PostConstruct
 //    public void initIt() throws Exception {
@@ -38,7 +42,7 @@ public class RestControllerAPIs {
 //    			custStores // взять коллекцию hashmap
 //				.entrySet() // полный набор ключ-значение
 				reactiveCustomerRepository
-				.findAll();
+				.findAll(sortByIdAsc());
 //				.stream()//создаем поток из коллекции
 //				.map(entry -> entry.getValue()) // берем каждый элемент потока и достаем оттуда значение, то есть объект кастомер
 //				.collect(Collectors.toList()); // записуем результат в лист
@@ -75,5 +79,23 @@ public class RestControllerAPIs {
     	Mono<Boolean> mono = reactiveCustomerRepository.deleteCustomerByCustId(id);
     	return mono;
     }
+
+
+    private Sort sortByIdAsc() {
+        return new Sort(Sort.Direction.ASC, "custId");
+    }
+
+    @GetMapping("/bw/{letter}")
+	public List<Customer> getNameBeginwith (@PathVariable String letter) {
+    	List<Customer> listOfCustomers = mongoQuery.queryBeginsWith(letter);
+    	return listOfCustomers;
+	}
+
+@GetMapping ("/fbn/{name}")
+	public List<Customer> findByName (@PathVariable String name) {
+    	return repositoryCustomer.findByFirstname(name);
 }
 
+}
+
+//найти по фамилии, найти по возрасту, найти по возрасту более чем.
